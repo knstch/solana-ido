@@ -1,8 +1,0 @@
-{
-  // Ensure the editor uses the rust-analyzer that matches the pinned toolchain in rust-toolchain.toml.
-  // This avoids proc-macro load errors like "unsupported metadata version".
-  "rust-analyzer.server.path": "/Users/cerepanovkonstantin/.cargo/bin/rust-analyzer",
-  "rust-analyzer.procMacro.enable": true,
-  "rust-analyzer.cargo.allFeatures": true
-}
-
