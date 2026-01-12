@@ -5,7 +5,7 @@ import * as helpers from "../tests/helpers";
 import { expect } from "chai";
 import BN from "bn.js";
 
-describe("initialize_sale successfully", () => {
+describe("initialize_sale tests", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
   const program = anchor.workspace.solanaIdo as Program<SolanaIdo>;
   const provider = anchor.getProvider() as anchor.AnchorProvider;
