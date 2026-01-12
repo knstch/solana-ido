@@ -1,0 +1,4 @@
+[toolchain]
+# Pin the toolchain so Cargo and rust-analyzer/proc-macro expansion use compatible metadata.
+channel = "nightly-2026-01-11"
+components = ["rust-src", "rust-analyzer"]
