@@ -8,7 +8,7 @@ pub struct JoinIdo<'info> {
     #[account(mut)]
     pub participant: Signer<'info>,
 
-    #[account()]
+    /// CHECK: This account is used only as a seed to derive the ido_campaign PDA
     pub ido_campaign_owner: AccountInfo<'info>,
     
     #[account(

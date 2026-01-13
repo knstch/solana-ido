@@ -148,6 +148,9 @@ describe("deposit_tokens_to_sale tests", () => {
       tokensTreasuryPda
     );
 
+    const idoCampaign = await program.account.idoCampaign.fetch(idoCampaignPda);
+
     expect(tokensTreasuryAccount.amount.toString()).to.equal((helpers.hardCap.toString()).toString());
+    expect(idoCampaign.tokenSupplyDeposited).to.equal(true);
   });
 });
