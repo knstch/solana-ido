@@ -75,6 +75,11 @@ fn check_campaign(ido_campaign: &IdoCampaign, participant: &AccountInfo, number_
     let now = Clock::get()?.unix_timestamp as u64;
 
     require!(
+        ido_campaign.token_supply_deposited,
+        IdoError::ErrTokenSupplyNotDeposited,
+    );
+    
+    require!(
         number_of_allocations > 0 && number_of_allocations <= ido_campaign.available_allocations_per_participant, 
         IdoError::ErrInvalidNumberOfAllocations,
     );

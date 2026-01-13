@@ -48,4 +48,6 @@ pub enum IdoError {
     ErrUserAlreadyJoined,
     #[msg("Insufficient funds")]
     ErrInsufficientFunds,
+    #[msg("Token supply not deposited")]
+    ErrTokenSupplyNotDeposited,
 }

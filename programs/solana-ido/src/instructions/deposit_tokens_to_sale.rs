@@ -12,6 +12,7 @@ pub struct DepositTokensToSale<'info> {
     pub owner_token_account: Account<'info, TokenAccount>,
 
     #[account(
+        mut,
         seeds = [b"ido_campaign", owner.key().as_ref()], bump,
     )]
     pub ido_campaign: Account<'info, IdoCampaign>,
@@ -27,7 +28,7 @@ pub struct DepositTokensToSale<'info> {
 
 pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     let owner_token_account = &ctx.accounts.owner_token_account;
-    let ido_campaign = &ctx.accounts.ido_campaign;
+    let ido_campaign = &mut ctx.accounts.ido_campaign;
     let token_mint_account = &ctx.accounts.token_mint;
     let tokens_treasury = &ctx.accounts.tokens_treasury;
 
@@ -54,6 +55,8 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
     token::transfer_checked(cpi_ctx, ido_campaign.hard_cap, token_mint_account.decimals)?;
+
+    ido_campaign.token_supply_deposited = true;
 
     return Ok(());
 }
