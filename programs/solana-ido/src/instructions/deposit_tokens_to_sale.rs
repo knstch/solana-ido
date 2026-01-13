@@ -8,11 +8,11 @@ use {
 pub struct DepositTokensToSale<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
-    #[account(mut)]
+    #[account(mut, constraint = owner_token_account.owner == owner.key() @ IdoError::InvalidOwner)]
     pub owner_token_account: Account<'info, TokenAccount>,
 
     #[account(
-        seeds = [b"ido_campaign"], bump,
+        seeds = [b"ido_campaign", owner.key().as_ref()], bump,
     )]
     pub ido_campaign: Account<'info, IdoCampaign>,
 
@@ -22,37 +22,60 @@ pub struct DepositTokensToSale<'info> {
     pub tokens_treasury: Account<'info, TokenAccount>,
 
     pub token_mint: Account<'info, Mint>,
-
     pub token_program: Program<'info, Token>,
 }
 
 pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     let owner_token_account = &ctx.accounts.owner_token_account;
+    let ido_campaign = &ctx.accounts.ido_campaign;
+    let token_mint_account = &ctx.accounts.token_mint;
+    let tokens_treasury = &ctx.accounts.tokens_treasury;
+
+    check_token_accounts(
+        owner_token_account, 
+        ido_campaign, 
+        token_mint_account.key(), 
+        tokens_treasury, 
+    )?;
     
     require!(
-        ctx.accounts.ido_campaign.token_mint != owner_token_account.mint,
-        IdoError::InvalidOwnerTokenAccount
-    );
-    require!(
-        ctx.accounts.token_mint.key() == owner_token_account.mint,
-        IdoError::InvalidMintAccount
-    );
-    require!(
-        owner_token_account.amount >= ctx.accounts.ido_campaign.total_supply,
+        owner_token_account.amount >= ido_campaign.total_supply,
         IdoError::InvalidBalanceOfTokensToDeposit
     );
 
     let cpi_accounts = TransferChecked {
         from: owner_token_account.to_account_info(),
-        to: ctx.accounts.tokens_treasury.to_account_info(),
+        to: tokens_treasury.to_account_info(),
         authority: ctx.accounts.owner.to_account_info(),
-        mint: ctx.accounts.token_mint.to_account_info(),
+        mint: token_mint_account.to_account_info(),
     };
 
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-    token::transfer_checked(cpi_ctx, owner_token_account.amount, ctx.accounts.token_mint.decimals)?;
+    token::transfer_checked(cpi_ctx, ido_campaign.total_supply, token_mint_account.decimals)?;
+
+    return Ok(());
+}
+
+fn check_token_accounts(
+    owner_token_account: &TokenAccount, 
+    ido_campaign: &IdoCampaign, 
+    token_mint_account_key: Pubkey, 
+    tokens_treasury: &TokenAccount,
+) -> Result<()> {
+    require!(
+        token_mint_account_key == ido_campaign.token_mint,
+        IdoError::InvalidMintAccount
+    );
+    require!(
+        ido_campaign.token_mint == owner_token_account.mint,
+        IdoError::InvalidOwnerTokenAccount
+    );
+    require!(
+        tokens_treasury.mint == token_mint_account_key,
+        IdoError::InvalidTokensTreasuryMint
+    );
 
     return Ok(());
 }

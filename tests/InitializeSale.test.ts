@@ -4,12 +4,13 @@ import { SolanaIdo } from "../target/types/solana_ido";
 import * as helpers from "../tests/helpers";
 import { expect } from "chai";
 import BN from "bn.js";
+import { Keypair } from "@solana/web3.js";
 
 describe("initialize_sale tests", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
   const program = anchor.workspace.solanaIdo as Program<SolanaIdo>;
   const provider = anchor.getProvider() as anchor.AnchorProvider;
-  const payer = (provider.wallet as anchor.Wallet).payer;
+  const payer = Keypair.generate();
   let mint: anchor.web3.PublicKey;
 
   before(async () => {

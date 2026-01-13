@@ -32,4 +32,8 @@ pub enum IdoError {
     InvalidOwnerTokenAccount,
     #[msg("Invalid available tokens after cliff ptc")]
     InvalidAvailableTokensAfterCliffPtc,
+    #[msg("Invalid tokens treasury mint")]
+    InvalidTokensTreasuryMint,
+    #[msg("Invalid owner")]
+    InvalidOwner,
 }

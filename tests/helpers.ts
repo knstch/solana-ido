@@ -31,8 +31,7 @@ export const airdropSol = async (
 };
 
 export const createMintAndMintToOwner = async (provider: anchor.AnchorProvider, 
-    owner: PublicKey, 
-    amount: number = 1000): Promise<{ mint: PublicKey, amount: number }> => {
+    owner: PublicKey): Promise<{ mint: PublicKey }> => {
     const payer = (provider.wallet as anchor.Wallet).payer;
     const mint = await createMint(
       provider.connection,
@@ -42,7 +41,7 @@ export const createMintAndMintToOwner = async (provider: anchor.AnchorProvider,
       6
     );
 
-    return { mint, amount };
+    return { mint };
 }
 
 export type ExpectedIdlError = {
@@ -80,6 +79,6 @@ export function expectIdlError(
     if (expected.number !== undefined) expect(translated.error.errorCode.number).to.eq(expected.number);
     return;
   }
-  
+
   expect.fail("Unexpected translated error type");
 }
