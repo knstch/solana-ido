@@ -42,10 +42,10 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     cliff: u64, 
     price: f64, 
     total_supply: u64, 
-    available_to_buy: u64,
+    allocation: u64,
     available_tokens_after_cliff_ptc: i32) -> Result<()> {
     check_time(start_time, end_time, cliff)?;
-    check_economic_parameters(price, total_supply, available_to_buy, available_tokens_after_cliff_ptc)?;
+    check_economic_parameters(price, total_supply, allocation, available_tokens_after_cliff_ptc)?;
 
     ctx.accounts.ido_campaign.authority = ctx.accounts.owner.key();
     ctx.accounts.ido_campaign.token_treasury = ctx.accounts.tokens_treasury.key();
@@ -56,7 +56,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ctx.accounts.ido_campaign.end_time = end_time;
     ctx.accounts.ido_campaign.price = price;
     ctx.accounts.ido_campaign.total_supply = total_supply;
-    ctx.accounts.ido_campaign.available_to_buy = available_to_buy;
+    ctx.accounts.ido_campaign.allocation = allocation;
     ctx.accounts.ido_campaign.token_mint = ctx.accounts.token_mint.key();
 
     return Ok(());
@@ -74,11 +74,11 @@ fn check_time(start_time: u64, end_time: u64, cliff: u64) -> Result<()> {
     return Ok(());
 }
 
-fn check_economic_parameters(price: f64, total_supply: u64, available_to_buy: u64, available_tokens_after_cliff_ptc: i32) -> Result<()> {
+fn check_economic_parameters(price: f64, total_supply: u64, allocation: u64, available_tokens_after_cliff_ptc: i32) -> Result<()> {
     require!(price > 0.0, IdoError::InvalidPrice);
     require!(total_supply > 0, IdoError::InvalidTotalSupply);
-    require!(total_supply > available_to_buy, IdoError::InvalidTotalSupply);
-    require!(available_to_buy > 0, IdoError::InvalidAvailableToBuy);
+    require!(total_supply > allocation, IdoError::InvalidTotalSupply);
+    require!(allocation > 0, IdoError::InvalidAvailableToBuy);
     require!(available_tokens_after_cliff_ptc > 0, IdoError::InvalidAvailableTokensAfterCliffPtc);
 
     return Ok(());

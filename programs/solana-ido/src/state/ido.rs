@@ -13,6 +13,6 @@ pub struct IdoCampaign {
     pub price: f64,
     pub total_supply: u64,
     pub total_claimed: u64,
-    pub available_to_buy: u64,
+    pub allocation: u64,
     pub token_mint: Pubkey,
 }
