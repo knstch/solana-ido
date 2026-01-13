@@ -8,7 +8,7 @@ use {
 pub struct DepositTokensToSale<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
-    #[account(mut, constraint = owner_token_account.owner == owner.key() @ IdoError::InvalidOwner)]
+    #[account(mut, constraint = owner_token_account.owner == owner.key() @ IdoError::ErrInvalidOwner)]
     pub owner_token_account: Account<'info, TokenAccount>,
 
     #[account(
@@ -40,7 +40,7 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     
     require!(
         owner_token_account.amount >= ido_campaign.hard_cap,
-        IdoError::InvalidBalanceOfTokensToDeposit
+        IdoError::ErrInvalidBalanceOfTokensToDeposit
     );
 
     let cpi_accounts = TransferChecked {
@@ -66,15 +66,15 @@ fn check_token_accounts(
 ) -> Result<()> {
     require!(
         token_mint_account_key == ido_campaign.token_mint,
-        IdoError::InvalidMintAccount
+        IdoError::ErrInvalidMintAccount
     );
     require!(
         ido_campaign.token_mint == owner_token_account.mint,
-        IdoError::InvalidOwnerTokenAccount
+        IdoError::ErrInvalidOwnerTokenAccount
     );
     require!(
         tokens_treasury.mint == token_mint_account_key,
-        IdoError::InvalidTokensTreasuryMint
+        IdoError::ErrInvalidTokensTreasuryMint
     );
 
     return Ok(());

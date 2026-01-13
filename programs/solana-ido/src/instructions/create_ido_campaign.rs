@@ -44,9 +44,11 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     allocation: u64,
     soft_cap: u64,
     hard_cap: u64,
-    available_tokens_after_cliff_ptc: i32) -> Result<()> {
+    available_tokens_after_cliff_ptc: i32,
+    available_allocations_per_participant: u64,
+) -> Result<()> {
     check_time(start_time, end_time, cliff)?;
-    check_economic_parameters(price, allocation, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
+    check_economic_parameters(price, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
 
     ctx.accounts.ido_campaign.authority = ctx.accounts.owner.key();
     ctx.accounts.ido_campaign.token_treasury = ctx.accounts.tokens_treasury.key();
@@ -63,6 +65,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ctx.accounts.ido_campaign.soft_cap = soft_cap;
     ctx.accounts.ido_campaign.hard_cap = hard_cap;
     ctx.accounts.ido_campaign.token_mint = ctx.accounts.token_mint.key();
+    ctx.accounts.ido_campaign.available_allocations_per_participant = available_allocations_per_participant;
 
     return Ok(());
 }
@@ -70,28 +73,30 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
 fn check_time(start_time: u64, end_time: u64, cliff: u64) -> Result<()> {
     let now = Clock::get()?.unix_timestamp as u64;
 
-    require!(start_time > now, IdoError::InvalidStartTime);
-    require!(end_time > start_time, IdoError::InvalidEndTime);
-    require!(end_time != start_time, IdoError::InvalidEndTime);
-    require!(cliff > start_time, IdoError::InvalidCliff);
-    require!(cliff < end_time, IdoError::InvalidCliff);
+    require!(start_time > now, IdoError::ErrInvalidStartTime);
+    require!(end_time > start_time, IdoError::ErrInvalidEndTime);
+    require!(end_time != start_time, IdoError::ErrInvalidEndTime);
+    require!(cliff > start_time, IdoError::ErrInvalidCliff);
+    require!(cliff < end_time, IdoError::ErrInvalidCliff);
 
     return Ok(());
 }
 
 fn check_economic_parameters(
     price: f64,  
-    allocation: u64, 
+    allocation: u64,
+    available_allocations_per_participant: u64,
     soft_cap: u64,
     hard_cap: u64,
     available_tokens_after_cliff_ptc: i32,
 ) -> Result<()> {
-    require!(price > 0.0, IdoError::InvalidPrice);
-    require!(allocation > 0, IdoError::InvalidAllocation);
-    require!(available_tokens_after_cliff_ptc > 0, IdoError::InvalidAvailableTokensAfterCliffPtc);
-    require!(soft_cap > 0, IdoError::InvalidSoftCap);
-    require!(hard_cap > 0, IdoError::InvalidHardCap);
-    require!(hard_cap > soft_cap, IdoError::InvalidHardCap);
+    require!(price > 0.0, IdoError::ErrInvalidPrice);
+    require!(allocation > 0, IdoError::ErrInvalidAllocation);
+    require!(available_allocations_per_participant > 0, IdoError::ErrInvalidAvailableAllocationsPerParticipant);
+    require!(available_tokens_after_cliff_ptc > 0, IdoError::ErrInvalidAvailableTokensAfterCliffPtc);
+    require!(soft_cap > 0, IdoError::ErrInvalidSoftCap);
+    require!(hard_cap > 0, IdoError::ErrInvalidHardCap);
+    require!(hard_cap > soft_cap, IdoError::ErrInvalidHardCap);
 
     return Ok(());
 }

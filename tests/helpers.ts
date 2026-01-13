@@ -13,6 +13,7 @@ export const allocation = new BN(100);
 export const softCap = new BN(500);
 export const hardCap = new BN(1000);
 export const availableTokensAfterCliffPtc = 20;
+export const availableAllocationsPerParticipant = new BN(5);
 
 export const airdropSol = async (
   provider: anchor.AnchorProvider,

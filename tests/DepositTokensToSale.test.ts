@@ -30,7 +30,8 @@ describe("deposit_tokens_to_sale tests", () => {
         helpers.allocation,
         helpers.softCap,
         helpers.hardCap,
-        helpers.availableTokensAfterCliffPtc
+        helpers.availableTokensAfterCliffPtc,
+        helpers.availableAllocationsPerParticipant
     ).accounts({
         owner: payer.publicKey,
         tokenMint: mint,

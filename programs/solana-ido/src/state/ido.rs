@@ -17,5 +17,6 @@ pub struct IdoCampaign {
     pub allocation: u64,
     pub soft_cap: u64,
     pub hard_cap: u64,
+    pub available_allocations_per_participant: u64,
     pub token_mint: Pubkey,
 }

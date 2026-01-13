@@ -33,7 +33,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -58,7 +59,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -83,7 +85,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -108,7 +111,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -133,7 +137,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -158,7 +163,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -183,7 +189,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -208,7 +215,8 @@ describe("initialize_sale tests", () => {
           new BN(0),
           helpers.softCap,
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -233,7 +241,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
-          0
+          0,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -258,7 +267,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           new BN(0),
           helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -283,7 +293,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           new BN(0),
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -308,7 +319,8 @@ describe("initialize_sale tests", () => {
           helpers.allocation,
           helpers.softCap,
           helpers.softCap,
-          helpers.availableTokensAfterCliffPtc
+          helpers.availableTokensAfterCliffPtc,
+          helpers.availableAllocationsPerParticipant
         )
         .accounts({
           owner: payer.publicKey,
@@ -322,6 +334,32 @@ describe("initialize_sale tests", () => {
     }
   });
 
+  it("available allocations per participant is equal to 0", async () => {
+    try {
+      await program.methods
+        .initializeSale(
+          helpers.startTime,
+          helpers.endTime,
+          helpers.cliff,
+          helpers.price,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
+          helpers.availableTokensAfterCliffPtc,
+          new BN(0)
+        )
+        .accounts({
+          owner: payer.publicKey,
+          tokenMint: mint,
+        })
+        .signers([payer])
+        .rpc();
+      expect.fail("Expected initializeSale to throw");
+    } catch (error: any) {
+      helpers.expectIdlError(program, error, { msg: "Invalid available allocations per participant" });
+    }
+  });
+
   it("initialize_sale successfully", async () => {
     const sig = await program.methods.initializeSale(
         helpers.startTime,
@@ -331,7 +369,8 @@ describe("initialize_sale tests", () => {
         helpers.allocation,
         helpers.softCap,
         helpers.hardCap,
-        helpers.availableTokensAfterCliffPtc
+        helpers.availableTokensAfterCliffPtc,
+        helpers.availableAllocationsPerParticipant
     ).accounts({
         owner: payer.publicKey,
         tokenMint: mint,

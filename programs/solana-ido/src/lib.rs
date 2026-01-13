@@ -23,7 +23,9 @@ pub mod solana_ido {
         allocation: u64,
         soft_cap: u64,
         hard_cap: u64,
-        available_tokens_after_cliff_ptc: i32) -> Result<()> {
+        available_tokens_after_cliff_ptc: i32,
+        available_allocations_per_participant: u64,
+    ) -> Result<()> {
         crate::instructions::create_ido_campaign::initialize_sale(
             ctx,
             start_time, 
@@ -33,9 +35,15 @@ pub mod solana_ido {
             allocation, 
             soft_cap,
             hard_cap,
-            available_tokens_after_cliff_ptc)
+            available_tokens_after_cliff_ptc,
+            available_allocations_per_participant,
+        )
     }
     pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
         crate::instructions::deposit_tokens_to_sale::deposit_tokens_to_sale(ctx)
+    }
+
+    pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()> {
+        crate::instructions::join_ido::join_ido(ctx, number_of_allocations)
     }
 }

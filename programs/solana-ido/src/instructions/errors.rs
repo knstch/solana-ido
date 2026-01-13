@@ -3,37 +3,49 @@ use anchor_lang::prelude::*;
 #[error_code]
 pub enum IdoError {
     #[msg("Unauthorized")]
-    Unauthorized,
+    ErrUnauthorized,
     #[msg("Invalid proof")]
-    InvalidProof,
+    ErrInvalidProof,
     #[msg("Invalid start time")]
-    InvalidStartTime,
+    ErrInvalidStartTime,
     #[msg("Invalid end time")]
-    InvalidEndTime,
+    ErrInvalidEndTime,
     #[msg("Invalid cliff")]
-    InvalidCliff,
+    ErrInvalidCliff,
     #[msg("Invalid price")]
-    InvalidPrice,
+    ErrInvalidPrice,
     #[msg("Invalid balance of tokens to deposit")]
-    InvalidBalanceOfTokensToDeposit,
+    ErrInvalidBalanceOfTokensToDeposit,
     #[msg("Invalid allocation")]
-    InvalidAllocation,
+    ErrInvalidAllocation,
     #[msg("Math overflow")]
-    MathOverflow,
+    ErrMathOverflow,
     #[msg("Nothing to claim")]
-    NothingToClaim,
+    ErrNothingToClaim,
     #[msg("Invalid mint account")]
-    InvalidMintAccount,
+    ErrInvalidMintAccount,
     #[msg("Invalid owner token account")]
-    InvalidOwnerTokenAccount,
+    ErrInvalidOwnerTokenAccount,
     #[msg("Invalid available tokens after cliff ptc")]
-    InvalidAvailableTokensAfterCliffPtc,
+    ErrInvalidAvailableTokensAfterCliffPtc,
     #[msg("Invalid tokens treasury mint")]
-    InvalidTokensTreasuryMint,
+    ErrInvalidTokensTreasuryMint,
     #[msg("Invalid owner")]
-    InvalidOwner,
+    ErrInvalidOwner,
     #[msg("Invalid soft cap")]
-    InvalidSoftCap,
+    ErrInvalidSoftCap,
     #[msg("Invalid hard cap")]
-    InvalidHardCap,
+    ErrInvalidHardCap,
+    #[msg("Invalid available allocations per participant")]
+    ErrInvalidAvailableAllocationsPerParticipant,
+    #[msg("Invalid number of allocations")]
+    ErrInvalidNumberOfAllocations,
+    #[msg("Now is not in sale period")]
+    ErrInvalidSalePeriod,
+    #[msg("This allocation is not available")]
+    ErrThisAllocationIsNotAvailable,
+    #[msg("User already joined")]
+    ErrUserAlreadyJoined,
+    #[msg("Insufficient funds")]
+    ErrInsufficientFunds,
 }
