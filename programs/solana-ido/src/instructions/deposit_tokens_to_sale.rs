@@ -39,7 +39,7 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     )?;
     
     require!(
-        owner_token_account.amount >= ido_campaign.total_supply,
+        owner_token_account.amount >= ido_campaign.hard_cap,
         IdoError::InvalidBalanceOfTokensToDeposit
     );
 
@@ -53,7 +53,7 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-    token::transfer_checked(cpi_ctx, ido_campaign.total_supply, token_mint_account.decimals)?;
+    token::transfer_checked(cpi_ctx, ido_campaign.hard_cap, token_mint_account.decimals)?;
 
     return Ok(());
 }

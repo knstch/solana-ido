@@ -20,17 +20,19 @@ pub mod solana_ido {
         end_time: u64, 
         cliff: u64, 
         price: f64, 
-        total_supply: u64, 
-        available_to_buy: u64,
+        allocation: u64,
+        soft_cap: u64,
+        hard_cap: u64,
         available_tokens_after_cliff_ptc: i32) -> Result<()> {
         crate::instructions::create_ido_campaign::initialize_sale(
             ctx,
             start_time, 
             end_time, 
             cliff, 
-            price, 
-            total_supply, 
-            available_to_buy, 
+            price,  
+            allocation, 
+            soft_cap,
+            hard_cap,
             available_tokens_after_cliff_ptc)
     }
     pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {

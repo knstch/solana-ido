@@ -30,8 +30,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff,
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -54,8 +55,9 @@ describe("initialize_sale tests", () => {
           helpers.startTime,
           helpers.cliff,
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -78,8 +80,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff,
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -102,8 +105,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff.sub(new BN(1)),
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -126,8 +130,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.endTime.add(new BN(1)),
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -150,8 +155,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff,
           0,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -174,8 +180,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff,
           -1,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -190,7 +197,7 @@ describe("initialize_sale tests", () => {
     }
   });
 
-  it("total supply is equal to 0", async () => {
+  it("allocation is equal to 0", async () => {
     try {
       await program.methods
         .initializeSale(
@@ -199,7 +206,8 @@ describe("initialize_sale tests", () => {
           helpers.cliff,
           helpers.price,
           new BN(0),
-          helpers.availableToBuy,
+          helpers.softCap,
+          helpers.hardCap,
           helpers.availableTokensAfterCliffPtc
         )
         .accounts({
@@ -210,55 +218,7 @@ describe("initialize_sale tests", () => {
         .rpc();
       expect.fail("Expected initializeSale to throw");
     } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid total supply" });
-    }
-  });
-
-  it("total supply is less then available to buy", async () => {
-    try {
-      await program.methods
-        .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
-          helpers.price,
-          helpers.totalSupply,
-          helpers.totalSupply.add(new BN(1)),
-          helpers.availableTokensAfterCliffPtc
-        )
-        .accounts({
-          owner: payer.publicKey,
-          tokenMint: mint,
-        })
-        .signers([payer])
-        .rpc();
-      expect.fail("Expected initializeSale to throw");
-    } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid total supply" });
-    }
-  });
-
-  it("available to buy is equal to 0", async () => {
-    try {
-      await program.methods
-        .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
-          helpers.price,
-          helpers.totalSupply,
-          new BN(0),
-          helpers.availableTokensAfterCliffPtc
-        )
-        .accounts({
-          owner: payer.publicKey,
-          tokenMint: mint,
-        })
-        .signers([payer])
-        .rpc();
-      expect.fail("Expected initializeSale to throw");
-    } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid available to buy" });
+      helpers.expectIdlError(program, error, { msg: "Invalid allocation" });
     }
   });
 
@@ -270,8 +230,9 @@ describe("initialize_sale tests", () => {
           helpers.endTime,
           helpers.cliff,
           helpers.price,
-          helpers.totalSupply,
-          helpers.availableToBuy,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.hardCap,
           0
         )
         .accounts({
@@ -286,14 +247,90 @@ describe("initialize_sale tests", () => {
     }
   });
 
+  it("soft cap is equal to 0", async () => {
+    try {
+      await program.methods
+        .initializeSale(
+          helpers.startTime,
+          helpers.endTime,
+          helpers.cliff,
+          helpers.price,
+          helpers.allocation,
+          new BN(0),
+          helpers.hardCap,
+          helpers.availableTokensAfterCliffPtc
+        )
+        .accounts({
+          owner: payer.publicKey,
+          tokenMint: mint,
+        })
+        .signers([payer])
+        .rpc();
+      expect.fail("Expected initializeSale to throw");
+    } catch (error: any) {
+      helpers.expectIdlError(program, error, { msg: "Invalid soft cap" });
+    }
+  });
+
+  it("hard cap is equal to 0", async () => {
+    try {
+      await program.methods
+        .initializeSale(
+          helpers.startTime,
+          helpers.endTime,
+          helpers.cliff,
+          helpers.price,
+          helpers.allocation,
+          helpers.softCap,
+          new BN(0),
+          helpers.availableTokensAfterCliffPtc
+        )
+        .accounts({
+          owner: payer.publicKey,
+          tokenMint: mint,
+        })
+        .signers([payer])
+        .rpc();
+      expect.fail("Expected initializeSale to throw");
+    } catch (error: any) {
+      helpers.expectIdlError(program, error, { msg: "Invalid hard cap" });
+    }
+  });
+
+  it("hard cap is less than or equal to soft cap", async () => {
+    try {
+      await program.methods
+        .initializeSale(
+          helpers.startTime,
+          helpers.endTime,
+          helpers.cliff,
+          helpers.price,
+          helpers.allocation,
+          helpers.softCap,
+          helpers.softCap,
+          helpers.availableTokensAfterCliffPtc
+        )
+        .accounts({
+          owner: payer.publicKey,
+          tokenMint: mint,
+        })
+        .signers([payer])
+        .rpc();
+      expect.fail("Expected initializeSale to throw");
+    } catch (error: any) {
+      helpers.expectIdlError(program, error, { msg: "Invalid hard cap" });
+    }
+  });
+
   it("initialize_sale successfully", async () => {
     const sig = await program.methods.initializeSale(
         helpers.startTime,
         helpers.endTime,
         helpers.cliff,
         helpers.price,
-        helpers.totalSupply,
-        helpers.availableToBuy,
+        helpers.allocation,
+        helpers.softCap,
+        helpers.hardCap,
         helpers.availableTokensAfterCliffPtc
     ).accounts({
         owner: payer.publicKey,
@@ -306,7 +343,7 @@ describe("initialize_sale tests", () => {
       "confirmed"
     );
 
-    const tx = await provider.connection.getTransaction(sig, {
+    await provider.connection.getTransaction(sig, {
       commitment: "confirmed",
       maxSupportedTransactionVersion: 0,
     });

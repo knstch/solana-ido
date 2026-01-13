@@ -9,8 +9,9 @@ export const startTime = new BN(Math.floor(Date.now() / 1000) + 10);
 export const cliff = startTime.add(new BN(1));
 export const endTime = startTime.add(new BN(3));
 export const price = 0.0001;
-export const totalSupply = new BN(1000);
-export const availableToBuy = new BN(200);
+export const allocation = new BN(100);
+export const softCap = new BN(500);
+export const hardCap = new BN(1000);
 export const availableTokensAfterCliffPtc = 20;
 
 export const airdropSol = async (

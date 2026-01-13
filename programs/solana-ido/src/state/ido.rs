@@ -11,8 +11,11 @@ pub struct IdoCampaign {
     pub start_time: u64,
     pub end_time: u64,
     pub price: f64,
-    pub total_supply: u64,
     pub total_claimed: u64,
+    pub total_sold: u64,
+    pub total_participants: u64,
     pub allocation: u64,
+    pub soft_cap: u64,
+    pub hard_cap: u64,
     pub token_mint: Pubkey,
 }

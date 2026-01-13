@@ -14,10 +14,6 @@ pub enum IdoError {
     InvalidCliff,
     #[msg("Invalid price")]
     InvalidPrice,
-    #[msg("Invalid total supply")]
-    InvalidTotalSupply,
-    #[msg("Invalid available to buy")]
-    InvalidAvailableToBuy,
     #[msg("Invalid balance of tokens to deposit")]
     InvalidBalanceOfTokensToDeposit,
     #[msg("Invalid allocation")]
@@ -36,4 +32,8 @@ pub enum IdoError {
     InvalidTokensTreasuryMint,
     #[msg("Invalid owner")]
     InvalidOwner,
+    #[msg("Invalid soft cap")]
+    InvalidSoftCap,
+    #[msg("Invalid hard cap")]
+    InvalidHardCap,
 }

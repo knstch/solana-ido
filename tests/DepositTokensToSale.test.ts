@@ -27,8 +27,9 @@ describe("deposit_tokens_to_sale tests", () => {
         helpers.endTime,
         helpers.cliff,
         helpers.price,
-        helpers.totalSupply,
-        helpers.availableToBuy,
+        helpers.allocation,
+        helpers.softCap,
+        helpers.hardCap,
         helpers.availableTokensAfterCliffPtc
     ).accounts({
         owner: payer.publicKey,
@@ -118,7 +119,7 @@ describe("deposit_tokens_to_sale tests", () => {
       mint,
       ownerAta,
       payer,
-      helpers.totalSupply.toNumber() * 10 ** 6
+      helpers.hardCap.toNumber() * 10 ** 6
     );
 
     await program.methods
@@ -146,6 +147,6 @@ describe("deposit_tokens_to_sale tests", () => {
       tokensTreasuryPda
     );
 
-    expect(tokensTreasuryAccount.amount.toString()).to.equal((helpers.totalSupply.toString()).toString());
+    expect(tokensTreasuryAccount.amount.toString()).to.equal((helpers.hardCap.toString()).toString());
   });
 });

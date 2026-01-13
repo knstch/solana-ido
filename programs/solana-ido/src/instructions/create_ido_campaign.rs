@@ -41,11 +41,12 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     end_time: u64, 
     cliff: u64, 
     price: f64, 
-    total_supply: u64, 
     allocation: u64,
+    soft_cap: u64,
+    hard_cap: u64,
     available_tokens_after_cliff_ptc: i32) -> Result<()> {
     check_time(start_time, end_time, cliff)?;
-    check_economic_parameters(price, total_supply, allocation, available_tokens_after_cliff_ptc)?;
+    check_economic_parameters(price, allocation, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
 
     ctx.accounts.ido_campaign.authority = ctx.accounts.owner.key();
     ctx.accounts.ido_campaign.token_treasury = ctx.accounts.tokens_treasury.key();
@@ -55,8 +56,12 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ctx.accounts.ido_campaign.start_time = start_time;
     ctx.accounts.ido_campaign.end_time = end_time;
     ctx.accounts.ido_campaign.price = price;
-    ctx.accounts.ido_campaign.total_supply = total_supply;
+    ctx.accounts.ido_campaign.total_sold = 0;
+    ctx.accounts.ido_campaign.total_participants = 0;
+    ctx.accounts.ido_campaign.total_claimed = 0;
     ctx.accounts.ido_campaign.allocation = allocation;
+    ctx.accounts.ido_campaign.soft_cap = soft_cap;
+    ctx.accounts.ido_campaign.hard_cap = hard_cap;
     ctx.accounts.ido_campaign.token_mint = ctx.accounts.token_mint.key();
 
     return Ok(());
@@ -74,12 +79,19 @@ fn check_time(start_time: u64, end_time: u64, cliff: u64) -> Result<()> {
     return Ok(());
 }
 
-fn check_economic_parameters(price: f64, total_supply: u64, allocation: u64, available_tokens_after_cliff_ptc: i32) -> Result<()> {
+fn check_economic_parameters(
+    price: f64,  
+    allocation: u64, 
+    soft_cap: u64,
+    hard_cap: u64,
+    available_tokens_after_cliff_ptc: i32,
+) -> Result<()> {
     require!(price > 0.0, IdoError::InvalidPrice);
-    require!(total_supply > 0, IdoError::InvalidTotalSupply);
-    require!(total_supply > allocation, IdoError::InvalidTotalSupply);
-    require!(allocation > 0, IdoError::InvalidAvailableToBuy);
+    require!(allocation > 0, IdoError::InvalidAllocation);
     require!(available_tokens_after_cliff_ptc > 0, IdoError::InvalidAvailableTokensAfterCliffPtc);
+    require!(soft_cap > 0, IdoError::InvalidSoftCap);
+    require!(hard_cap > 0, IdoError::InvalidHardCap);
+    require!(hard_cap > soft_cap, IdoError::InvalidHardCap);
 
     return Ok(());
 }
