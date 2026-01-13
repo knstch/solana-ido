@@ -118,7 +118,7 @@ describe("deposit_tokens_to_sale tests", () => {
       mint,
       ownerAta,
       payer,
-      1000 * 10 ** 6
+      helpers.totalSupply.toNumber() * 10 ** 6
     );
 
     await program.methods
@@ -145,7 +145,7 @@ describe("deposit_tokens_to_sale tests", () => {
       provider.connection,
       tokensTreasuryPda
     );
-    
+
     expect(tokensTreasuryAccount.amount.toString()).to.equal((helpers.totalSupply.toString()).toString());
   });
 });
