@@ -21,4 +21,5 @@ pub struct IdoCampaign {
     pub available_allocations_per_participant: u64,
     pub token_mint: Pubkey,
     pub token_supply_deposited: bool,
+    pub funds_withdrawn: bool,
 }

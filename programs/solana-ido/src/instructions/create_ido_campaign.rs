@@ -51,23 +51,25 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     check_time(start_sale_time, end_sale_time, cliff, vesting_end_time)?;
     check_economic_parameters(price, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
 
-    ctx.accounts.ido_campaign.authority = ctx.accounts.owner.key();
-    ctx.accounts.ido_campaign.token_treasury = ctx.accounts.tokens_treasury.key();
-    ctx.accounts.ido_campaign.sol_treasury = ctx.accounts.sol_treasury.key();
-    ctx.accounts.ido_campaign.cliff = cliff;
-    ctx.accounts.ido_campaign.available_tokens_after_cliff_ptc = available_tokens_after_cliff_ptc;
-    ctx.accounts.ido_campaign.start_sale_time = start_sale_time;
-    ctx.accounts.ido_campaign.end_sale_time = end_sale_time;
-    ctx.accounts.ido_campaign.vesting_end_time = vesting_end_time;
-    ctx.accounts.ido_campaign.price = price;
-    ctx.accounts.ido_campaign.total_sold = 0;
-    ctx.accounts.ido_campaign.total_participants = 0;
-    ctx.accounts.ido_campaign.total_claimed = 0;
-    ctx.accounts.ido_campaign.allocation = allocation;
-    ctx.accounts.ido_campaign.soft_cap = soft_cap;
-    ctx.accounts.ido_campaign.hard_cap = hard_cap;
-    ctx.accounts.ido_campaign.token_mint = ctx.accounts.token_mint.key();
-    ctx.accounts.ido_campaign.available_allocations_per_participant = available_allocations_per_participant;
+    let ido_campaign = &mut ctx.accounts.ido_campaign;
+    ido_campaign.authority = ctx.accounts.owner.key();
+    ido_campaign.token_treasury = ctx.accounts.tokens_treasury.key();
+    ido_campaign.sol_treasury = ctx.accounts.sol_treasury.key();
+    ido_campaign.cliff = cliff;
+    ido_campaign.available_tokens_after_cliff_ptc = available_tokens_after_cliff_ptc;
+    ido_campaign.start_sale_time = start_sale_time;
+    ido_campaign.end_sale_time = end_sale_time;
+    ido_campaign.vesting_end_time = vesting_end_time;
+    ido_campaign.price = price;
+    ido_campaign.total_sold = 0;
+    ido_campaign.total_participants = 0;
+    ido_campaign.total_claimed = 0;
+    ido_campaign.allocation = allocation;
+    ido_campaign.soft_cap = soft_cap;
+    ido_campaign.hard_cap = hard_cap;
+    ido_campaign.token_mint = ctx.accounts.token_mint.key();
+    ido_campaign.available_allocations_per_participant = available_allocations_per_participant;
+    ido_campaign.funds_withdrawn = false;
 
     return Ok(());
 }

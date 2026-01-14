@@ -60,4 +60,10 @@ pub enum IdoError {
     ErrInvalidTokensTreasuryAmount,
     #[msg("Insufficient funds in treasury")]
     ErrInsufficientFundsInTreasury,
+    #[msg("Funds already withdrawn")]
+    ErrFundsAlreadyWithdrawn,
+    #[msg("Soft cap not reached")]
+    ErrSoftCapNotReached,
+    #[msg("Invalid token mint")]
+    ErrInvalidTokenMint,
 }

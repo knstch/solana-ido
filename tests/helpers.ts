@@ -135,6 +135,10 @@ export async function setupCampaign(params: {
     [Buffer.from("tokens_treasury"), idoCampaignPda.toBuffer()],
     program.programId
   );
+  const [solTreasuryPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("sol_treasury"), idoCampaignPda.toBuffer()],
+    program.programId
+  );
 
   const p: any = program;
   await p.methods
@@ -187,6 +191,7 @@ export async function setupCampaign(params: {
   return {
     idoCampaignPda,
     tokensTreasuryPda,
+    solTreasuryPda,
     ownerAta,
   };
 }

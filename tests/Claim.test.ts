@@ -194,7 +194,8 @@ describe("claim tests", () => {
     const startSaleTime = new BN(now0 + 1);
     const endSaleTime = new BN(now0 + 10);
     const cliff = new BN(now0 + 12);
-    const vestingEndTime = new BN(now0 + 18);
+    // Make vesting window longer to avoid flakiness due to localnet clock skew / integer rounding.
+    const vestingEndTime = new BN(now0 + 60);
 
     const allocation = new BN(100);
     const softCap = new BN(500);
@@ -232,7 +233,7 @@ describe("claim tests", () => {
 
     const participantAta = getAssociatedTokenAddressSync(mint, participant.publicKey, false);
 
-    await helpers.waitUntil(cliff.toNumber());
+    await helpers.waitUntil(cliff.toNumber() + 1);
     const bal0 = await helpers.getTokenBalanceOrZero(provider, participantAta);
     await program.methods
       .claim()
@@ -257,8 +258,8 @@ describe("claim tests", () => {
     const bal1 = await helpers.getTokenBalanceOrZero(provider, participantAta);
     expect(bal1.sub(bal0).toString()).to.equal(userAfterFirst.claimed.toString());
 
-    // Wait further into the linear period so at least 1 new token unlocks.
-    await helpers.waitUntil(cliff.toNumber() + 4);
+    // Wait further into the linear period so a non-zero delta unlocks even with clock skew.
+    await helpers.waitUntil(cliff.toNumber() + 10);
     const now1 = Math.floor(Date.now() / 1000);
 
     const unlockedMin = helpers.expectedUnlockedTotal({
