@@ -76,7 +76,13 @@ pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()>
     Ok(())
 }
 
-fn check_campaign(ido_campaign: &IdoCampaign, participant: &AccountInfo, number_of_allocations: u64, total_cost_lamports: u64, amount_to_buy: u64) -> Result<()> {
+fn check_campaign<'info>(
+    ido_campaign: &IdoCampaign,
+    participant: &Signer<'info>,
+    number_of_allocations: u64,
+    total_cost_lamports: u64,
+    amount_to_buy: u64,
+) -> Result<()> {
     let now = Clock::get()?.unix_timestamp as u64;
 
     require!(
@@ -102,7 +108,7 @@ fn check_campaign(ido_campaign: &IdoCampaign, participant: &AccountInfo, number_
         IdoError::ErrThisAllocationIsNotAvailable,
     );
 
-    let participant_lamports = participant.lamports();
+    let participant_lamports = participant.to_account_info().lamports();
     let user_rent = Rent::get()?.minimum_balance(std::mem::size_of::<User>() + 8);
     
     let required_lamports = total_cost_lamports

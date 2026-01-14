@@ -1,7 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { createMint } from "@solana/spl-token";
+import {
+  createMint,
+  getAccount,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+} from "@solana/spl-token";
 import BN from "bn.js";
 import { expect } from "chai";
 
@@ -45,6 +50,188 @@ export const createMintAndMintToOwner = async (provider: anchor.AnchorProvider,
     );
 
     return { mint };
+}
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const waitUntil = async (unixTs: number) => {
+  const now = Math.floor(Date.now() / 1000);
+  const delta = unixTs - now;
+  if (delta <= 0) return;
+  await sleep((delta + 1) * 1000);
+};
+
+export function expectedUnlockedTotal(params: {
+  total: number;
+  pctAfterCliff: number;
+  cliff: number;
+  vestingEnd: number;
+  now: number;
+}) {
+  const { total, pctAfterCliff, cliff, vestingEnd, now } = params;
+  if (now < cliff) return 0;
+  const cliffUnlocked = Math.floor((total * pctAfterCliff) / 100);
+  if (now >= vestingEnd) return total;
+  if (now === cliff) return cliffUnlocked;
+  const remaining = total - cliffUnlocked;
+  const elapsed = now - cliff;
+  const duration = vestingEnd - cliff;
+  const linear = Math.floor((remaining * elapsed) / duration);
+  return Math.min(total, cliffUnlocked + linear);
+}
+
+export async function getTokenBalanceOrZero(
+  provider: anchor.AnchorProvider,
+  tokenAccount: PublicKey
+): Promise<BN> {
+  try {
+    const acc = await getAccount(provider.connection, tokenAccount);
+    return new BN(acc.amount.toString());
+  } catch {
+    return new BN(0);
+  }
+}
+
+export async function setupCampaign(params: {
+  program: any;
+  provider: anchor.AnchorProvider;
+  owner: anchor.web3.Keypair;
+  mint: PublicKey;
+  startSaleTime: BN;
+  endSaleTime: BN;
+  cliff: BN;
+  vestingEndTime: BN;
+  price: number;
+  allocation: BN;
+  softCap: BN;
+  hardCap: BN;
+  availableTokensAfterCliffPtc: number;
+  availableAllocationsPerParticipant: BN;
+}) {
+  const {
+    program,
+    provider,
+    owner,
+    mint,
+    startSaleTime,
+    endSaleTime,
+    cliff,
+    vestingEndTime,
+    price,
+    allocation,
+    softCap,
+    hardCap,
+    availableTokensAfterCliffPtc,
+    availableAllocationsPerParticipant,
+  } = params;
+
+  await airdropSol(provider, owner.publicKey, 10);
+
+  const [idoCampaignPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("ido_campaign"), owner.publicKey.toBuffer()],
+    program.programId
+  );
+  const [tokensTreasuryPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("tokens_treasury"), idoCampaignPda.toBuffer()],
+    program.programId
+  );
+
+  const p: any = program;
+  await p.methods
+    .initializeSale(
+      startSaleTime,
+      endSaleTime,
+      cliff,
+      vestingEndTime,
+      price,
+      allocation,
+      softCap,
+      hardCap,
+      availableTokensAfterCliffPtc,
+      availableAllocationsPerParticipant
+    )
+    .accounts({
+      owner: owner.publicKey,
+      tokenMint: mint,
+    })
+    .signers([owner])
+    .rpc();
+
+  const ownerAta = await getOrCreateAssociatedTokenAccount(
+    provider.connection,
+    owner,
+    mint,
+    owner.publicKey
+  ).then((ata) => ata.address);
+
+  // Mint plenty; deposit will transfer exactly `hardCap` base units.
+  await mintTo(
+    provider.connection,
+    owner,
+    mint,
+    ownerAta,
+    owner,
+    hardCap.toNumber() * 10 ** 6
+  );
+
+  await p.methods
+    .depositTokensToSale()
+    .accounts({
+      owner: owner.publicKey,
+      tokenMint: mint,
+      ownerTokenAccount: ownerAta,
+    })
+    .signers([owner])
+    .rpc();
+
+  return {
+    idoCampaignPda,
+    tokensTreasuryPda,
+    ownerAta,
+  };
+}
+
+export async function joinAsParticipant(params: {
+  program: any;
+  provider: anchor.AnchorProvider;
+  owner: anchor.web3.Keypair;
+  participant: anchor.web3.Keypair;
+  idoCampaignPda: PublicKey;
+  startSaleTime: BN;
+  endSaleTime: BN;
+  allocations: BN;
+}) {
+  const {
+    program,
+    provider,
+    owner,
+    participant,
+    idoCampaignPda,
+    allocations,
+    startSaleTime,
+    endSaleTime,
+  } = params;
+
+  const p: any = program;
+  await airdropSol(provider, participant.publicKey, 10);
+  await waitUntil(startSaleTime.toNumber());
+  expect(Math.floor(Date.now() / 1000)).to.be.lessThan(endSaleTime.toNumber());
+
+  await p.methods
+    .joinIdo(allocations)
+    .accounts({
+      participant: participant.publicKey,
+      idoCampaignOwner: owner.publicKey,
+    })
+    .signers([participant])
+    .rpc();
+
+  const [userPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("user"), idoCampaignPda.toBuffer(), participant.publicKey.toBuffer()],
+    program.programId
+  );
+
+  return { userPda };
 }
 
 export type ExpectedIdlError = {

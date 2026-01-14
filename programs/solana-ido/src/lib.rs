@@ -48,4 +48,8 @@ pub mod solana_ido {
     pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()> {
         crate::instructions::join_ido::join_ido(ctx, number_of_allocations)
     }
+    
+    pub fn claim(ctx: Context<Claim>) -> Result<()> {
+        crate::instructions::claim::claim(ctx)
+    }
 }

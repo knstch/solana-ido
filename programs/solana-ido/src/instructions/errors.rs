@@ -52,4 +52,12 @@ pub enum IdoError {
     ErrTokenSupplyNotDeposited,
     #[msg("Invalid vesting end time")]
     ErrInvalidVestingEndTime,
+    #[msg("User not joined")]
+    ErrUserNotJoined,
+    #[msg("Invalid ido campaign")]
+    ErrInvalidIdoCampaign,
+    #[msg("Invalid tokens treasury amount")]
+    ErrInvalidTokensTreasuryAmount,
+    #[msg("Insufficient funds in treasury")]
+    ErrInsufficientFundsInTreasury,
 }
