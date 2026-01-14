@@ -6,10 +6,10 @@ pub enum IdoError {
     ErrUnauthorized,
     #[msg("Invalid proof")]
     ErrInvalidProof,
-    #[msg("Invalid start time")]
-    ErrInvalidStartTime,
-    #[msg("Invalid end time")]
-    ErrInvalidEndTime,
+    #[msg("Invalid start sale time")]
+    ErrInvalidStartSaleTime,
+    #[msg("Invalid end sale time")]
+    ErrInvalidEndSaleTime,
     #[msg("Invalid cliff")]
     ErrInvalidCliff,
     #[msg("Invalid price")]
@@ -50,4 +50,6 @@ pub enum IdoError {
     ErrInsufficientFunds,
     #[msg("Token supply not deposited")]
     ErrTokenSupplyNotDeposited,
+    #[msg("Invalid vesting end time")]
+    ErrInvalidVestingEndTime,
 }

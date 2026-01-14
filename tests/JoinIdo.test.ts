@@ -13,6 +13,7 @@ describe("join_ido tests", () => {
   const provider = anchor.getProvider() as anchor.AnchorProvider;
   const owner = Keypair.generate();
   const participant = Keypair.generate();
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   let mint: anchor.web3.PublicKey;
   let ownerAta: anchor.web3.PublicKey;
@@ -28,10 +29,16 @@ describe("join_ido tests", () => {
       owner.publicKey
     ));
 
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 1);
+    const endSaleTime = startSaleTime.add(new BN(1000));
+    const cliff = endSaleTime.add(new BN(100));
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     await program.methods.initializeSale(
-      helpers.startTime,
-      helpers.endTime,
-      helpers.cliff,
+      startSaleTime,
+      endSaleTime,
+      cliff,
+      vestingEndTime,
       helpers.price,
       helpers.allocation,
       helpers.softCap,
@@ -89,10 +96,16 @@ describe("join_ido tests", () => {
       newOwner.publicKey
     );
 
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 100);
+    const endSaleTime = startSaleTime.add(new BN(1000));
+    const cliff = endSaleTime.add(new BN(100));
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     await program.methods.initializeSale(
-      helpers.startTime,
-      helpers.endTime,
-      helpers.cliff,
+      startSaleTime,
+      endSaleTime,
+      cliff,
+      vestingEndTime,
       helpers.price,
       helpers.allocation,
       helpers.softCap,
@@ -163,10 +176,12 @@ describe("join_ido tests", () => {
     const futureStartTime = new BN(Math.floor(Date.now() / 1000) + 100);
     const futureEndTime = futureStartTime.add(new BN(10));
 
+    const futureVestingEndTime = futureEndTime.add(new BN(2000));
     await program.methods.initializeSale(
       futureStartTime,
       futureEndTime,
-      futureStartTime.add(new BN(1)),
+      futureEndTime.add(new BN(1)),
+      futureVestingEndTime,
       helpers.price,
       helpers.allocation,
       helpers.softCap,
@@ -228,13 +243,16 @@ describe("join_ido tests", () => {
       newOwner.publicKey
     );
 
-    const pastStartTime = new BN(Math.floor(Date.now() / 1000) - 100);
-    const pastEndTime = new BN(Math.floor(Date.now() / 1000) - 50);
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 1);
+    const endSaleTime = new BN(now + 2);
 
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     await program.methods.initializeSale(
-      pastStartTime,
-      pastEndTime,
-      pastStartTime.add(new BN(1)),
+      startSaleTime,
+      endSaleTime,
+      endSaleTime.add(new BN(1)),
+      vestingEndTime,
       helpers.price,
       helpers.allocation,
       helpers.softCap,
@@ -272,6 +290,8 @@ describe("join_ido tests", () => {
       .signers([newOwner])
       .rpc();
 
+    await sleep(2500);
+
     try {
       await program.methods
         .joinIdo(new BN(1))
@@ -298,13 +318,19 @@ describe("join_ido tests", () => {
       newOwner.publicKey
     );
 
-    const smallHardCap = new BN(100);
-    const largeAllocation = new BN(100);
+    const smallHardCap = new BN(600);
+    const largeAllocation = new BN(200);
 
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 1);
+    const endSaleTime = startSaleTime.add(new BN(1000));
+    const cliff = endSaleTime.add(new BN(100));
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     await program.methods.initializeSale(
-      helpers.startTime,
-      helpers.endTime,
-      helpers.cliff,
+      startSaleTime,
+      endSaleTime,
+      cliff,
+      vestingEndTime,
       helpers.price,
       largeAllocation,
       helpers.softCap,
@@ -342,6 +368,8 @@ describe("join_ido tests", () => {
       .signers([newOwner])
       .rpc();
 
+    await sleep(1500);
+
     try {
       await program.methods
         .joinIdo(helpers.availableAllocationsPerParticipant)
@@ -359,7 +387,7 @@ describe("join_ido tests", () => {
 
   it("insufficient funds", async () => {
     const poorParticipant = Keypair.generate();
-    await helpers.airdropSol(provider, poorParticipant.publicKey, 0.001);
+    await helpers.airdropSol(provider, poorParticipant.publicKey, 0.002);
 
     const numberAllocations = new BN(1);
     const amountToBuy = helpers.allocation.mul(numberAllocations);
@@ -375,12 +403,12 @@ describe("join_ido tests", () => {
     if (poorParticipant.publicKey.toBuffer().length > 0) {
       const balance = await provider.connection.getBalance(poorParticipant.publicKey);
       if (balance >= requiredLamports) {
-        // If balance is sufficient, skip this test or adjust balance
         return;
       }
     }
 
     try {
+      await sleep(1500);
       await program.methods
         .joinIdo(numberAllocations)
         .accounts({
@@ -401,6 +429,7 @@ describe("join_ido tests", () => {
 
     const numberAllocations = new BN(1);
 
+    await sleep(1500);
     await program.methods
       .joinIdo(numberAllocations)
       .accounts({
@@ -445,6 +474,7 @@ describe("join_ido tests", () => {
 
     const numberAllocations = new BN(1);
 
+    await sleep(1500);
     await program.methods
       .joinIdo(numberAllocations)
       .accounts({
@@ -465,9 +495,7 @@ describe("join_ido tests", () => {
         .rpc();
       expect.fail("Expected joinIdo to throw");
     } catch (error: any) {
-      // With init constraint, Anchor will throw "Allocate: account ... already in use"
-      // But we should also test the explicit check if user.joined_at != 0
-      expect(error).to.not.be.null;
+      helpers.expectIdlError(program, error, { msg: "User already joined" });
     }
   });
 
@@ -484,6 +512,8 @@ describe("join_ido tests", () => {
     const allocations2 = new BN(1);
     const allocations3 = new BN(1);
 
+    await sleep(1500);
+    const idoCampaignBefore = await program.account.idoCampaign.fetch(idoCampaignPda);
     await program.methods
       .joinIdo(allocations1)
       .accounts({
@@ -518,7 +548,11 @@ describe("join_ido tests", () => {
       .add(helpers.allocation.mul(allocations2))
       .add(helpers.allocation.mul(allocations3));
 
-    expect(idoCampaign.totalSold.toString()).to.equal(expectedTotalSold.toString());
-    expect(idoCampaign.totalParticipants.toString()).to.equal("3");
+    expect(idoCampaign.totalSold.toString()).to.equal(
+      idoCampaignBefore.totalSold.add(expectedTotalSold).toString()
+    );
+    expect(idoCampaign.totalParticipants.toString()).to.equal(
+      (idoCampaignBefore.totalParticipants.toNumber() + 3).toString()
+    );
   });
 });

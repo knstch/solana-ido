@@ -24,11 +24,17 @@ describe("initialize_sale tests", () => {
   it("start time is in the past", async () => {
     try {
       const now = Math.floor(Date.now() / 1000);
+
+      const startSaleTime = new BN(now - 10);
+      const endSaleTime = new BN(now + 1000);
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          new BN(now - 10),
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -44,17 +50,23 @@ describe("initialize_sale tests", () => {
         .rpc();
       expect.fail("Expected initializeSale to throw");
     } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid start time" });
+      helpers.expectIdlError(program, error, { msg: "Invalid start sale time" });
     }
   });
 
   it("end time is before start time", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.sub(new BN(1));
+      const cliff = startSaleTime.add(new BN(1000));
+      const vestingEndTime = startSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.endTime,
-          helpers.startTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -70,17 +82,23 @@ describe("initialize_sale tests", () => {
         .rpc();
       expect.fail("Expected initializeSale to throw");
     } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid end time" });
+      helpers.expectIdlError(program, error, { msg: "Invalid end sale time" });
     }
   });
 
   it("end time is equal to start time", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime;
+      const cliff = startSaleTime.add(new BN(1000));
+      const vestingEndTime = startSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.endTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -96,17 +114,23 @@ describe("initialize_sale tests", () => {
         .rpc();
       expect.fail("Expected initializeSale to throw");
     } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid end time" });
+      helpers.expectIdlError(program, error, { msg: "Invalid end sale time" });
     }
   });
 
   it("cliff is before start time", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = startSaleTime.sub(new BN(1));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff.sub(new BN(1)),
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -126,13 +150,19 @@ describe("initialize_sale tests", () => {
     }
   });
 
-  it("cliff is greater then end time", async () => {
+  it("cliff is less than or equal to end time", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime;
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.endTime.add(new BN(1)),
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -154,11 +184,17 @@ describe("initialize_sale tests", () => {
 
   it("price is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           0,
           helpers.allocation,
           helpers.softCap,
@@ -180,11 +216,17 @@ describe("initialize_sale tests", () => {
 
   it("price is less then 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           -1,
           helpers.allocation,
           helpers.softCap,
@@ -206,11 +248,17 @@ describe("initialize_sale tests", () => {
 
   it("allocation is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           new BN(0),
           helpers.softCap,
@@ -232,11 +280,17 @@ describe("initialize_sale tests", () => {
 
   it("available tokens after cliff ptc is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -258,11 +312,17 @@ describe("initialize_sale tests", () => {
 
   it("soft cap is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           new BN(0),
@@ -284,11 +344,17 @@ describe("initialize_sale tests", () => {
 
   it("hard cap is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -310,11 +376,17 @@ describe("initialize_sale tests", () => {
 
   it("hard cap is less than or equal to soft cap", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -336,11 +408,17 @@ describe("initialize_sale tests", () => {
 
   it("available allocations per participant is equal to 0", async () => {
     try {
+      const now = Math.floor(Date.now() / 1000);
+      const startSaleTime = new BN(now + 100);
+      const endSaleTime = startSaleTime.add(new BN(1000));
+      const cliff = endSaleTime.add(new BN(100));
+      const vestingEndTime = endSaleTime.add(new BN(2000));
       await program.methods
         .initializeSale(
-          helpers.startTime,
-          helpers.endTime,
-          helpers.cliff,
+          startSaleTime,
+          endSaleTime,
+          cliff,
+          vestingEndTime,
           helpers.price,
           helpers.allocation,
           helpers.softCap,
@@ -361,10 +439,22 @@ describe("initialize_sale tests", () => {
   });
 
   it("initialize_sale successfully", async () => {
+    const newPayer = Keypair.generate();
+    await helpers.airdropSol(provider, newPayer.publicKey, 10);
+    const { mint: newMint } = await helpers.createMintAndMintToOwner(
+      provider,
+      newPayer.publicKey
+    );
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 100);
+    const endSaleTime = startSaleTime.add(new BN(1000));
+    const cliff = endSaleTime.add(new BN(100));
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     const sig = await program.methods.initializeSale(
-        helpers.startTime,
-        helpers.endTime,
-        helpers.cliff,
+        startSaleTime,
+        endSaleTime,
+        cliff,
+        vestingEndTime,
         helpers.price,
         helpers.allocation,
         helpers.softCap,
@@ -372,9 +462,9 @@ describe("initialize_sale tests", () => {
         helpers.availableTokensAfterCliffPtc,
         helpers.availableAllocationsPerParticipant
     ).accounts({
-        owner: payer.publicKey,
-        tokenMint: mint,
-    }).signers([payer]).rpc();
+        owner: newPayer.publicKey,
+        tokenMint: newMint,
+    }).signers([newPayer]).rpc();
     
     const latest = await provider.connection.getLatestBlockhash("confirmed");
     await provider.connection.confirmTransaction(

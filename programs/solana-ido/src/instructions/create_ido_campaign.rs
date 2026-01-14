@@ -37,9 +37,10 @@ pub struct CreateIdoCampaign<'info> {
 }
 
 pub fn initialize_sale(ctx: Context<CreateIdoCampaign>, 
-    start_time: u64, 
-    end_time: u64, 
+    start_sale_time: u64, 
+    end_sale_time: u64, 
     cliff: u64, 
+    vesting_end_time: u64,
     price: f64, 
     allocation: u64,
     soft_cap: u64,
@@ -47,7 +48,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     available_tokens_after_cliff_ptc: i32,
     available_allocations_per_participant: u64,
 ) -> Result<()> {
-    check_time(start_time, end_time, cliff)?;
+    check_time(start_sale_time, end_sale_time, cliff, vesting_end_time)?;
     check_economic_parameters(price, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
 
     ctx.accounts.ido_campaign.authority = ctx.accounts.owner.key();
@@ -55,8 +56,9 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ctx.accounts.ido_campaign.sol_treasury = ctx.accounts.sol_treasury.key();
     ctx.accounts.ido_campaign.cliff = cliff;
     ctx.accounts.ido_campaign.available_tokens_after_cliff_ptc = available_tokens_after_cliff_ptc;
-    ctx.accounts.ido_campaign.start_time = start_time;
-    ctx.accounts.ido_campaign.end_time = end_time;
+    ctx.accounts.ido_campaign.start_sale_time = start_sale_time;
+    ctx.accounts.ido_campaign.end_sale_time = end_sale_time;
+    ctx.accounts.ido_campaign.vesting_end_time = vesting_end_time;
     ctx.accounts.ido_campaign.price = price;
     ctx.accounts.ido_campaign.total_sold = 0;
     ctx.accounts.ido_campaign.total_participants = 0;
@@ -70,14 +72,14 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     return Ok(());
 }
 
-fn check_time(start_time: u64, end_time: u64, cliff: u64) -> Result<()> {
+fn check_time(start_sale_time: u64, end_sale_time: u64, cliff: u64, vesting_end_time: u64) -> Result<()> {
     let now = Clock::get()?.unix_timestamp as u64;
 
-    require!(start_time > now, IdoError::ErrInvalidStartTime);
-    require!(end_time > start_time, IdoError::ErrInvalidEndTime);
-    require!(end_time != start_time, IdoError::ErrInvalidEndTime);
-    require!(cliff > start_time, IdoError::ErrInvalidCliff);
-    require!(cliff < end_time, IdoError::ErrInvalidCliff);
+    require!(start_sale_time > now, IdoError::ErrInvalidStartSaleTime);
+    require!(end_sale_time > start_sale_time, IdoError::ErrInvalidEndSaleTime);
+    require!(end_sale_time != start_sale_time, IdoError::ErrInvalidEndSaleTime);
+    require!(cliff > start_sale_time && cliff > end_sale_time, IdoError::ErrInvalidCliff);
+    require!(vesting_end_time > end_sale_time, IdoError::ErrInvalidVestingEndTime);
 
     return Ok(());
 }

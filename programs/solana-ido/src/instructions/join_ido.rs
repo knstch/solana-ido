@@ -24,7 +24,7 @@ pub struct JoinIdo<'info> {
     pub sol_treasury: SystemAccount<'info>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = participant,
         space = 8 + std::mem::size_of::<User>(),
         seeds = [b"user", ido_campaign.key().as_ref(), participant.key().as_ref()], bump,
@@ -37,6 +37,11 @@ pub struct JoinIdo<'info> {
 pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()> {
     let ido_campaign = &ctx.accounts.ido_campaign;
     let participant = &ctx.accounts.participant;
+
+    require!(
+        ctx.accounts.user.joined_at == 0,
+        IdoError::ErrUserAlreadyJoined
+    );
 
     let amount_to_buy = number_of_allocations
         .checked_mul(ido_campaign.allocation)
@@ -85,7 +90,7 @@ fn check_campaign(ido_campaign: &IdoCampaign, participant: &AccountInfo, number_
     );
     
     require!(
-        now >= ido_campaign.start_time && now <= ido_campaign.end_time, 
+        now >= ido_campaign.start_sale_time && now <= ido_campaign.end_sale_time, 
         IdoError::ErrInvalidSalePeriod,
     );
     

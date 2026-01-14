@@ -5,6 +5,7 @@ import * as helpers from "../tests/helpers";
 import { expect } from "chai";
 import { getOrCreateAssociatedTokenAccount, mintTo, getAccount } from "@solana/spl-token";
 import { Keypair, PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
 
 describe("deposit_tokens_to_sale tests", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
@@ -22,10 +23,16 @@ describe("deposit_tokens_to_sale tests", () => {
       payer.publicKey
     ));
 
+    const now = Math.floor(Date.now() / 1000);
+    const startSaleTime = new BN(now + 100);
+    const endSaleTime = startSaleTime.add(new BN(1000));
+    const cliff = endSaleTime.add(new BN(100));
+    const vestingEndTime = endSaleTime.add(new BN(2000));
     await program.methods.initializeSale(
-        helpers.startTime,
-        helpers.endTime,
-        helpers.cliff,
+        startSaleTime,
+        endSaleTime,
+        cliff,
+        vestingEndTime,
         helpers.price,
         helpers.allocation,
         helpers.softCap,
