@@ -70,6 +70,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ido_campaign.token_mint = ctx.accounts.token_mint.key();
     ido_campaign.available_allocations_per_participant = available_allocations_per_participant;
     ido_campaign.funds_withdrawn = false;
+    ido_campaign.sale_closed = false;
 
     return Ok(());
 }

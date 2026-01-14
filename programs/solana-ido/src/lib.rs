@@ -56,4 +56,8 @@ pub mod solana_ido {
     pub fn withdraw_funds(ctx: Context<WithdrawFunds>) -> Result<()> {
         crate::instructions::withdraw_funds::withdraw_funds(ctx)
     }
+
+    pub fn close_campaign(ctx: Context<CloseCampaign>) -> Result<()> {
+        crate::instructions::close_campaign::close_campaign(ctx)
+    }
 }

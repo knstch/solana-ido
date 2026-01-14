@@ -66,4 +66,10 @@ pub enum IdoError {
     ErrSoftCapNotReached,
     #[msg("Invalid token mint")]
     ErrInvalidTokenMint,
+    #[msg("Sale already closed")]
+    ErrSaleAlreadyClosed,
+    #[msg("Sale is ended")]
+    ErrSaleEnded,
+    #[msg("Total claimed not zero")]
+    ErrTotalClaimedNotZero,
 }

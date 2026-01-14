@@ -86,6 +86,11 @@ fn check_campaign<'info>(
     let now = Clock::get()?.unix_timestamp as u64;
 
     require!(
+        !ido_campaign.sale_closed,
+        IdoError::ErrSaleAlreadyClosed,
+    );
+
+    require!(
         ido_campaign.token_supply_deposited,
         IdoError::ErrTokenSupplyNotDeposited,
     );

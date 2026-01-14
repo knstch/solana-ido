@@ -54,6 +54,7 @@ pub fn claim(ctx: Context<Claim>) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let ido_campaign = &mut ctx.accounts.ido_campaign;
 
+    require!(!ido_campaign.sale_closed, IdoError::ErrSaleAlreadyClosed);
     require!(ctx.accounts.token_mint.key() == ido_campaign.token_mint, IdoError::ErrInvalidTokensTreasuryMint);
     require!(ido_campaign.token_supply_deposited, IdoError::ErrTokenSupplyNotDeposited);
     require!(ctx.accounts.tokens_treasury.amount > 0, IdoError::ErrInvalidTokensTreasuryAmount);

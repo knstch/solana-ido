@@ -22,4 +22,5 @@ pub struct IdoCampaign {
     pub token_mint: Pubkey,
     pub token_supply_deposited: bool,
     pub funds_withdrawn: bool,
+    pub sale_closed: bool,
 }

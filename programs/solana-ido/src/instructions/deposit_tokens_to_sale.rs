@@ -32,6 +32,9 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
     let token_mint_account = &ctx.accounts.token_mint;
     let tokens_treasury = &ctx.accounts.tokens_treasury;
 
+    require!(!ido_campaign.sale_closed, IdoError::ErrSaleAlreadyClosed);
+    require!(!ido_campaign.funds_withdrawn, IdoError::ErrFundsAlreadyWithdrawn);
+
     check_token_accounts(
         owner_token_account, 
         ido_campaign, 
