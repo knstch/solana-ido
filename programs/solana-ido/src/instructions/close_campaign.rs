@@ -49,6 +49,7 @@ pub fn close_campaign(ctx: Context<CloseCampaign>) -> Result<()> {
     require!(!ido_campaign.funds_withdrawn, IdoError::ErrFundsAlreadyWithdrawn);
     require!(ido_campaign.total_claimed == 0, IdoError::ErrTotalClaimedNotZero);
     require!(ido_campaign.token_supply_deposited, IdoError::ErrTokenSupplyNotDeposited);
+    require!(ctx.accounts.token_mint.decimals == 0, IdoError::ErrInvalidTokenDecimals);
 
     let owner_key = ctx.accounts.owner.key();
     let bump = ctx.bumps.ido_campaign;

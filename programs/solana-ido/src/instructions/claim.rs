@@ -26,6 +26,7 @@ pub struct Claim<'info> {
         seeds = [b"tokens_treasury", ido_campaign.key().as_ref()],
         bump,
         constraint = tokens_treasury.mint == token_mint.key() @ IdoError::ErrInvalidTokensTreasuryMint,
+        constraint = tokens_treasury.key() == ido_campaign.token_treasury @ IdoError::ErrInvalidIdoCampaign,
     )]
     pub tokens_treasury: Account<'info, TokenAccount>,
 
@@ -55,6 +56,7 @@ pub fn claim(ctx: Context<Claim>) -> Result<()> {
     let ido_campaign = &mut ctx.accounts.ido_campaign;
 
     require!(!ido_campaign.sale_closed, IdoError::ErrSaleAlreadyClosed);
+    require!(ctx.accounts.token_mint.decimals == 0, IdoError::ErrInvalidTokenDecimals);
     require!(ctx.accounts.token_mint.key() == ido_campaign.token_mint, IdoError::ErrInvalidTokensTreasuryMint);
     require!(ido_campaign.token_supply_deposited, IdoError::ErrTokenSupplyNotDeposited);
     require!(ctx.accounts.tokens_treasury.amount > 0, IdoError::ErrInvalidTokensTreasuryAmount);

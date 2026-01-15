@@ -50,6 +50,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
 ) -> Result<()> {
     check_time(start_sale_time, end_sale_time, cliff, vesting_end_time)?;
     check_economic_parameters(price_lamports, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
+    require!(ctx.accounts.token_mint.decimals == 0, IdoError::ErrInvalidTokenDecimals);
 
     let ido_campaign = &mut ctx.accounts.ido_campaign;
     ido_campaign.authority = ctx.accounts.owner.key();

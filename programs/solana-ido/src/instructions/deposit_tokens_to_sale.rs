@@ -34,6 +34,9 @@ pub fn deposit_tokens_to_sale(ctx: Context<DepositTokensToSale>) -> Result<()> {
 
     require!(!ido_campaign.sale_closed, IdoError::ErrSaleAlreadyClosed);
     require!(!ido_campaign.funds_withdrawn, IdoError::ErrFundsAlreadyWithdrawn);
+    require!(!ido_campaign.token_supply_deposited, IdoError::ErrTokenSupplyAlreadyDeposited);
+    require!(token_mint_account.decimals == 0, IdoError::ErrInvalidTokenDecimals);
+    require!(!ido_campaign.token_supply_deposited, IdoError::ErrTokenSupplyAlreadyDeposited);
 
     check_token_accounts(
         owner_token_account, 

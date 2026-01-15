@@ -46,7 +46,7 @@ export const createMintAndMintToOwner = async (provider: anchor.AnchorProvider,
       payer,
       owner,
       owner,
-      6
+      0
     );
 
     return { mint };
@@ -174,7 +174,7 @@ export async function setupCampaign(params: {
     mint,
     ownerAta,
     owner,
-    hardCap.toNumber() * 10 ** 6
+    hardCap.toNumber()
   );
 
   await p.methods

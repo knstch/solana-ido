@@ -63,7 +63,7 @@ describe("join_ido tests", () => {
       mint,
       ownerAta,
       owner,
-      helpers.hardCap.toNumber() * 10 ** 6
+      helpers.hardCap.toNumber()
     );
 
     await program.methods
@@ -206,7 +206,7 @@ describe("join_ido tests", () => {
       newMint,
       newOwnerAta,
       newOwner,
-      helpers.hardCap.toNumber() * 10 ** 6
+      helpers.hardCap.toNumber()
     );
 
     await program.methods
@@ -277,7 +277,7 @@ describe("join_ido tests", () => {
       newMint,
       newOwnerAta,
       newOwner,
-      helpers.hardCap.toNumber() * 10 ** 6
+      helpers.hardCap.toNumber()
     );
 
     await program.methods
@@ -355,7 +355,7 @@ describe("join_ido tests", () => {
       newMint,
       newOwnerAta,
       newOwner,
-      smallHardCap.toNumber() * 10 ** 6
+      smallHardCap.toNumber()
     );
 
     await program.methods

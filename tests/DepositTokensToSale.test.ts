@@ -127,7 +127,7 @@ describe("deposit_tokens_to_sale tests", () => {
       mint,
       ownerAta,
       payer,
-      helpers.hardCap.toNumber() * 10 ** 6
+      helpers.hardCap.toNumber()
     );
 
     await program.methods

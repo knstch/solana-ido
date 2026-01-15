@@ -57,6 +57,7 @@ pub fn withdraw_funds(ctx: Context<WithdrawFunds>) -> Result<()> {
         ctx.accounts.token_mint.key(),
         ctx.accounts.owner_token_account.mint,
     )?;
+    require!(ctx.accounts.token_mint.decimals == 0, IdoError::ErrInvalidTokenDecimals);
 
     withdraw_all_sol_to_owners(&ctx)?;
 
@@ -115,7 +116,7 @@ fn withdraw_unsold_tokens_to_owner(ctx: &Context<WithdrawFunds>) -> Result<()> {
     let unsold_tokens = ido_campaign
         .hard_cap
         .checked_sub(ido_campaign.total_sold)
-        .unwrap_or(0);
+        .ok_or(IdoError::ErrMathOverflow)?;
     if unsold_tokens == 0 {
         return Ok(());
     }

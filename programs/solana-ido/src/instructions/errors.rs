@@ -80,4 +80,8 @@ pub enum IdoError {
     ErrNotEnoughFundsInSolTreasury,
     #[msg("Invalid sol treasury")]
     ErrInvalidSolTreasury,
+    #[msg("Token supply already deposited")]
+    ErrTokenSupplyAlreadyDeposited,
+    #[msg("Invalid token decimals")]
+    ErrInvalidTokenDecimals,
 }

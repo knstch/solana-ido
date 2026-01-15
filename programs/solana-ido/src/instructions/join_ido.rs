@@ -38,6 +38,8 @@ pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()>
     let ido_campaign = &ctx.accounts.ido_campaign;
     let participant = &ctx.accounts.participant;
 
+    require!(ido_campaign.price_lamports > 0, IdoError::ErrInvalidPrice);
+
     require!(
         ctx.accounts.user.joined_at == 0,
         IdoError::ErrUserAlreadyJoined
