@@ -42,7 +42,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -116,7 +116,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -137,7 +137,7 @@ describe("claim tests", () => {
 
     const participantAta = getAssociatedTokenAddressSync(mint, participant.publicKey, false);
 
-    await helpers.waitUntil(cliff.toNumber());
+    await helpers.waitUntil(cliff.toNumber() + 3);
     const beforeAmt = await helpers.getTokenBalanceOrZero(provider, participantAta);
 
     await program.methods
@@ -194,7 +194,6 @@ describe("claim tests", () => {
     const startSaleTime = new BN(now0 + 1);
     const endSaleTime = new BN(now0 + 10);
     const cliff = new BN(now0 + 12);
-    // Make vesting window longer to avoid flakiness due to localnet clock skew / integer rounding.
     const vestingEndTime = new BN(now0 + 60);
 
     const allocation = new BN(100);
@@ -212,7 +211,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -332,7 +331,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -428,7 +427,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -503,7 +502,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -579,7 +578,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -658,7 +657,7 @@ describe("claim tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,

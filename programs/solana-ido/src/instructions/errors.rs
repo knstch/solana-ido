@@ -72,4 +72,12 @@ pub enum IdoError {
     ErrSaleEnded,
     #[msg("Total claimed not zero")]
     ErrTotalClaimedNotZero,
+    #[msg("Nothing to refund")]
+    ErrNothingToRefund,
+    #[msg("Sale not closed")]
+    ErrSaleNotClosed,
+    #[msg("Not enough funds in sol treasury")]
+    ErrNotEnoughFundsInSolTreasury,
+    #[msg("Invalid sol treasury")]
+    ErrInvalidSolTreasury,
 }

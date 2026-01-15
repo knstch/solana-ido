@@ -4,7 +4,7 @@ import { SolanaIdo } from "../target/types/solana_ido";
 import * as helpers from "../tests/helpers";
 import { expect } from "chai";
 import { getOrCreateAssociatedTokenAccount, mintTo, getAccount } from "@solana/spl-token";
-import { Keypair, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 
 describe("join_ido tests", () => {
@@ -39,7 +39,7 @@ describe("join_ido tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      helpers.price,
+      helpers.priceLamports,
       helpers.allocation,
       helpers.softCap,
       helpers.hardCap,
@@ -106,7 +106,7 @@ describe("join_ido tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      helpers.price,
+      helpers.priceLamports,
       helpers.allocation,
       helpers.softCap,
       helpers.hardCap,
@@ -182,7 +182,7 @@ describe("join_ido tests", () => {
       futureEndTime,
       futureEndTime.add(new BN(1)),
       futureVestingEndTime,
-      helpers.price,
+      helpers.priceLamports,
       helpers.allocation,
       helpers.softCap,
       helpers.hardCap,
@@ -253,7 +253,7 @@ describe("join_ido tests", () => {
       endSaleTime,
       endSaleTime.add(new BN(1)),
       vestingEndTime,
-      helpers.price,
+      helpers.priceLamports,
       helpers.allocation,
       helpers.softCap,
       helpers.hardCap,
@@ -331,7 +331,7 @@ describe("join_ido tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      helpers.price,
+      helpers.priceLamports,
       largeAllocation,
       helpers.softCap,
       smallHardCap,
@@ -387,25 +387,19 @@ describe("join_ido tests", () => {
 
   it("insufficient funds", async () => {
     const poorParticipant = Keypair.generate();
-    await helpers.airdropSol(provider, poorParticipant.publicKey, 0.002);
+    const userRent = await provider.connection.getMinimumBalanceForRentExemption(
+      (program.account as any).user.size
+    );
+    const desiredLamports = userRent + 200_000;
+    await helpers.airdropSol(
+      provider,
+      poorParticipant.publicKey,
+      desiredLamports / anchor.web3.LAMPORTS_PER_SOL
+    );
 
     const numberAllocations = new BN(1);
     const amountToBuy = helpers.allocation.mul(numberAllocations);
-    const totalCostSol = helpers.price * amountToBuy.toNumber();
-    const totalCostLamports = Math.ceil(totalCostSol * LAMPORTS_PER_SOL);
-
-    const userRent = await provider.connection.getMinimumBalanceForRentExemption(
-      8 + 11 + 32 + 32 + 8 + 8 + 8
-    );
-
-    const requiredLamports = totalCostLamports + userRent;
-
-    if (poorParticipant.publicKey.toBuffer().length > 0) {
-      const balance = await provider.connection.getBalance(poorParticipant.publicKey);
-      if (balance >= requiredLamports) {
-        return;
-      }
-    }
+    const totalCostLamports = helpers.priceLamports.mul(amountToBuy).toNumber();
 
     try {
       await sleep(1500);
@@ -453,8 +447,7 @@ describe("join_ido tests", () => {
     const solTreasuryBalance = await provider.connection.getBalance(solTreasuryPda);
 
     const expectedAmount = helpers.allocation.mul(numberAllocations);
-    const expectedCostSol = helpers.price * expectedAmount.toNumber();
-    const expectedCostLamports = Math.floor(expectedCostSol * LAMPORTS_PER_SOL);
+    const expectedCostLamports = helpers.priceLamports.mul(expectedAmount).toNumber();
 
     expect(userAccount.amount.toString()).to.equal(expectedAmount.toString());
     expect(userAccount.participant.toString()).to.equal(newParticipant.publicKey.toString());

@@ -33,7 +33,7 @@ describe("deposit_tokens_to_sale tests", () => {
         endSaleTime,
         cliff,
         vestingEndTime,
-        helpers.price,
+        helpers.priceLamports,
         helpers.allocation,
         helpers.softCap,
         helpers.hardCap,

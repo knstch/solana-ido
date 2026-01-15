@@ -35,7 +35,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -67,7 +67,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -99,7 +99,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -131,7 +131,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -163,7 +163,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -195,39 +195,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          0,
-          helpers.allocation,
-          helpers.softCap,
-          helpers.hardCap,
-          helpers.availableTokensAfterCliffPtc,
-          helpers.availableAllocationsPerParticipant
-        )
-        .accounts({
-          owner: payer.publicKey,
-          tokenMint: mint,
-        })
-        .signers([payer])
-        .rpc();
-      expect.fail("Expected initializeSale to throw");
-    } catch (error: any) {
-      helpers.expectIdlError(program, error, { msg: "Invalid price" });
-    }
-  });
-
-  it("price is less then 0", async () => {
-    try {
-      const now = Math.floor(Date.now() / 1000);
-      const startSaleTime = new BN(now + 100);
-      const endSaleTime = startSaleTime.add(new BN(1000));
-      const cliff = endSaleTime.add(new BN(100));
-      const vestingEndTime = endSaleTime.add(new BN(2000));
-      await program.methods
-        .initializeSale(
-          startSaleTime,
-          endSaleTime,
-          cliff,
-          vestingEndTime,
-          -1,
+          new BN(0),
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -259,7 +227,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           new BN(0),
           helpers.softCap,
           helpers.hardCap,
@@ -291,7 +259,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -323,7 +291,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           new BN(0),
           helpers.hardCap,
@@ -355,7 +323,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           new BN(0),
@@ -387,7 +355,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.softCap,
@@ -419,7 +387,7 @@ describe("initialize_sale tests", () => {
           endSaleTime,
           cliff,
           vestingEndTime,
-          helpers.price,
+          helpers.priceLamports,
           helpers.allocation,
           helpers.softCap,
           helpers.hardCap,
@@ -455,7 +423,7 @@ describe("initialize_sale tests", () => {
         endSaleTime,
         cliff,
         vestingEndTime,
-        helpers.price,
+        helpers.priceLamports,
         helpers.allocation,
         helpers.softCap,
         helpers.hardCap,

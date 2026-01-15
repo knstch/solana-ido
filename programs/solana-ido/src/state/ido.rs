@@ -11,7 +11,7 @@ pub struct IdoCampaign {
     pub start_sale_time: u64,
     pub end_sale_time: u64,
     pub vesting_end_time: u64,
-    pub price: f64,
+    pub price_lamports: u64,
     pub total_claimed: u64,
     pub total_sold: u64,
     pub total_participants: u64,

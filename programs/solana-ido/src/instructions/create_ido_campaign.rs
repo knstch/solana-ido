@@ -41,7 +41,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     end_sale_time: u64, 
     cliff: u64, 
     vesting_end_time: u64,
-    price: f64, 
+    price_lamports: u64,
     allocation: u64,
     soft_cap: u64,
     hard_cap: u64,
@@ -49,7 +49,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     available_allocations_per_participant: u64,
 ) -> Result<()> {
     check_time(start_sale_time, end_sale_time, cliff, vesting_end_time)?;
-    check_economic_parameters(price, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
+    check_economic_parameters(price_lamports, allocation, available_allocations_per_participant, soft_cap, hard_cap, available_tokens_after_cliff_ptc)?;
 
     let ido_campaign = &mut ctx.accounts.ido_campaign;
     ido_campaign.authority = ctx.accounts.owner.key();
@@ -60,7 +60,7 @@ pub fn initialize_sale(ctx: Context<CreateIdoCampaign>,
     ido_campaign.start_sale_time = start_sale_time;
     ido_campaign.end_sale_time = end_sale_time;
     ido_campaign.vesting_end_time = vesting_end_time;
-    ido_campaign.price = price;
+    ido_campaign.price_lamports = price_lamports;
     ido_campaign.total_sold = 0;
     ido_campaign.total_participants = 0;
     ido_campaign.total_claimed = 0;
@@ -88,14 +88,14 @@ fn check_time(start_sale_time: u64, end_sale_time: u64, cliff: u64, vesting_end_
 }
 
 fn check_economic_parameters(
-    price: f64,  
+    price_lamports: u64,
     allocation: u64,
     available_allocations_per_participant: u64,
     soft_cap: u64,
     hard_cap: u64,
     available_tokens_after_cliff_ptc: i32,
 ) -> Result<()> {
-    require!(price > 0.0, IdoError::ErrInvalidPrice);
+    require!(price_lamports > 0, IdoError::ErrInvalidPrice);
     require!(allocation > 0, IdoError::ErrInvalidAllocation);
     require!(available_allocations_per_participant > 0, IdoError::ErrInvalidAvailableAllocationsPerParticipant);
     require!(available_tokens_after_cliff_ptc > 0, IdoError::ErrInvalidAvailableTokensAfterCliffPtc);

@@ -46,8 +46,10 @@ pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()>
     let amount_to_buy = number_of_allocations
         .checked_mul(ido_campaign.allocation)
         .ok_or(IdoError::ErrMathOverflow)?;
-    let total_cost_sol = ido_campaign.price * amount_to_buy as f64;
-    let total_cost_lamports = (total_cost_sol * 1_000_000_000.0) as u64;
+
+    let total_cost_lamports = amount_to_buy
+        .checked_mul(ido_campaign.price_lamports)
+        .ok_or(IdoError::ErrMathOverflow)?;
 
     check_campaign(ido_campaign, participant, number_of_allocations, total_cost_lamports, amount_to_buy)?;
 
@@ -66,6 +68,7 @@ pub fn join_ido(ctx: Context<JoinIdo>, number_of_allocations: u64) -> Result<()>
     ctx.accounts.user.ido_campaign = ido_campaign.key();
     ctx.accounts.user.participant = participant.key();
     ctx.accounts.user.amount = amount_to_buy;
+    ctx.accounts.user.paid_lamports = total_cost_lamports;
     ctx.accounts.user.claimed = 0;
 
     ctx.accounts.ido_campaign.total_sold = ctx.accounts.ido_campaign.total_sold

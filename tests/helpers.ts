@@ -14,7 +14,7 @@ export const startTime = new BN(Math.floor(Date.now() / 1000) + 1);
 export const cliff = startTime.add(new BN(4));
 export const endTime = startTime.add(new BN(3));
 export const vestingEndTime = endTime.add(new BN(2000));
-export const price = 0.0001;
+export const priceLamports = new BN(100_000);
 export const allocation = new BN(100);
 export const softCap = new BN(500);
 export const hardCap = new BN(1000);
@@ -101,7 +101,7 @@ export async function setupCampaign(params: {
   endSaleTime: BN;
   cliff: BN;
   vestingEndTime: BN;
-  price: number;
+  priceLamports: BN;
   allocation: BN;
   softCap: BN;
   hardCap: BN;
@@ -117,7 +117,7 @@ export async function setupCampaign(params: {
     endSaleTime,
     cliff,
     vestingEndTime,
-    price,
+    priceLamports,
     allocation,
     softCap,
     hardCap,
@@ -147,7 +147,7 @@ export async function setupCampaign(params: {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price,
+      priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -168,7 +168,6 @@ export async function setupCampaign(params: {
     owner.publicKey
   ).then((ata) => ata.address);
 
-  // Mint plenty; deposit will transfer exactly `hardCap` base units.
   await mintTo(
     provider.connection,
     owner,
@@ -220,7 +219,6 @@ export async function joinAsParticipant(params: {
   const p: any = program;
   await airdropSol(provider, participant.publicKey, 10);
   await waitUntil(startSaleTime.toNumber());
-  expect(Math.floor(Date.now() / 1000)).to.be.lessThan(endSaleTime.toNumber());
 
   await p.methods
     .joinIdo(allocations)

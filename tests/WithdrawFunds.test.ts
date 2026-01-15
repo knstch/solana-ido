@@ -58,7 +58,7 @@ describe("withdraw_funds tests", () => {
         endSaleTime,
         cliff,
         vestingEndTime,
-        helpers.price,
+        helpers.priceLamports,
         helpers.allocation,
         helpers.softCap,
         helpers.hardCap,
@@ -132,7 +132,7 @@ describe("withdraw_funds tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation: helpers.allocation,
       softCap: helpers.softCap,
       hardCap: helpers.hardCap,
@@ -193,7 +193,7 @@ describe("withdraw_funds tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation,
       softCap,
       hardCap,
@@ -264,7 +264,7 @@ describe("withdraw_funds tests", () => {
       endSaleTime,
       cliff,
       vestingEndTime,
-      price: helpers.price,
+      priceLamports: helpers.priceLamports,
       allocation: helpers.allocation,
       softCap: helpers.softCap,
       hardCap: helpers.hardCap,
@@ -339,7 +339,7 @@ describe("withdraw_funds tests", () => {
         endSaleTime,
         cliff,
         vestingEndTime,
-        price: 0.0001,
+        priceLamports: new BN(100_000),
         allocation,
         softCap,
         hardCap,
@@ -395,10 +395,10 @@ describe("withdraw_funds tests", () => {
     const ownerSolAfter = await provider.connection.getBalance(owner.publicKey);
     const launchpadSolAfter = await provider.connection.getBalance(LAUNCHPAD_OWNER);
 
-    const launchpadCut = Math.floor(solBefore / 100) * 5; // matches program: amount / 100 * 5
+    const launchpadCut = Math.floor(solBefore / 100) * 5;
     const ownerCut = solBefore - launchpadCut;
     if (tx?.meta?.fee != null) {
-      expect(ownerSolAfter).to.equal(ownerSolBefore + ownerCut - tx.meta.fee);
+      expect(ownerSolAfter).to.equal(ownerSolBefore + ownerCut);
       expect(launchpadSolAfter).to.equal(launchpadSolBefore + launchpadCut);
     } else {
       expect(ownerSolAfter).to.be.at.least(ownerSolBefore + ownerCut - 100_000);
