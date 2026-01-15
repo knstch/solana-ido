@@ -8,6 +8,12 @@ use {
 
 #[derive(Accounts)]
 pub struct WithdrawFunds<'info> {
+    #[account(
+        mut,
+        address = anchor_lang::solana_program::pubkey!("BRhY2VPGiDvEnQphYjgvbCXRkGTLBY4bXzeYjDuKYkv6") @ IdoError::ErrUnauthorized,
+    )]
+    pub launchpad_owner: SystemAccount<'info>,
+
     #[account(mut)]
     pub owner: Signer<'info>,
     
@@ -52,7 +58,7 @@ pub fn withdraw_funds(ctx: Context<WithdrawFunds>) -> Result<()> {
         ctx.accounts.owner_token_account.mint,
     )?;
 
-    withdraw_all_sol_to_owner(&ctx)?;
+    withdraw_all_sol_to_owners(&ctx)?;
 
     withdraw_unsold_tokens_to_owner(&ctx)?;
     
@@ -61,11 +67,14 @@ pub fn withdraw_funds(ctx: Context<WithdrawFunds>) -> Result<()> {
     return Ok(());
 }
 
-fn withdraw_all_sol_to_owner(ctx: &Context<WithdrawFunds>) -> Result<()> {
+fn withdraw_all_sol_to_owners(ctx: &Context<WithdrawFunds>) -> Result<()> {
     let amount = ctx.accounts.sol_treasury.lamports();
     if amount == 0 {
         return Ok(());
     }
+
+    let amount_to_launchpad_owner = amount / 100 * 5;
+    let amount_to_owner = amount - amount_to_launchpad_owner;
 
     let ido_campaign_key = ctx.accounts.ido_campaign.key();
     let bump = ctx.bumps.sol_treasury;
@@ -85,7 +94,18 @@ fn withdraw_all_sol_to_owner(ctx: &Context<WithdrawFunds>) -> Result<()> {
         },
         &signer,
     );
-    system_program::transfer(cpi_context, amount)?;
+    system_program::transfer(cpi_context, amount_to_owner)?;
+
+    let cpi_context = CpiContext::new_with_signer(
+        ctx.accounts.system_program.to_account_info(),
+        Transfer {
+            from: ctx.accounts.sol_treasury.to_account_info(),
+            to: ctx.accounts.launchpad_owner.to_account_info(),
+        },
+        &signer,
+    );
+    system_program::transfer(cpi_context, amount_to_launchpad_owner)?;
+    
     Ok(())
 }
 

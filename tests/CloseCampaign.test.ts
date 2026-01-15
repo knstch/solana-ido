@@ -169,7 +169,7 @@ describe("close_campaign tests", () => {
 
     const ownerAtaBefore = await getAccount(provider.connection, ownerAta);
     const treasuryBefore = await getAccount(provider.connection, tokensTreasuryPda);
-    expect(treasuryBefore.amount > 0).to.equal(true);
+    expect(treasuryBefore.amount.toString()).to.not.equal("0");
 
     // Put some SOL into sol_treasury by joining once.
     const { userPda } = await helpers.joinAsParticipant({
@@ -203,7 +203,7 @@ describe("close_campaign tests", () => {
     expect(idoCampaign.fundsWithdrawn).to.equal(true);
 
     const treasuryAfter = await getAccount(provider.connection, tokensTreasuryPda);
-    expect(treasuryAfter.amount).to.equal(0);
+    expect(treasuryAfter.amount.toString()).to.equal("0");
 
     const ownerAtaAfter = await getAccount(provider.connection, ownerAta);
     const ownerDelta = ownerAtaAfter.amount - ownerAtaBefore.amount;

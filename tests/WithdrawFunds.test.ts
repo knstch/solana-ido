@@ -11,6 +11,8 @@ import {
 } from "@solana/spl-token";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 
+const LAUNCHPAD_OWNER = new PublicKey("BRhY2VPGiDvEnQphYjgvbCXRkGTLBY4bXzeYjDuKYkv6");
+
 async function getConfirmedTxWithRetry(
   connection: anchor.web3.Connection,
   signature: string,
@@ -34,6 +36,10 @@ describe("withdraw_funds tests", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
   const program = anchor.workspace.solanaIdo as Program<SolanaIdo>;
   const provider = anchor.getProvider() as anchor.AnchorProvider;
+
+  before(async () => {
+    await helpers.airdropSol(provider, LAUNCHPAD_OWNER, 0.01);
+  });
 
   it("fails if token supply not deposited", async () => {
     const owner = Keypair.generate();
@@ -89,6 +95,7 @@ describe("withdraw_funds tests", () => {
       await program.methods
         .withdrawFunds()
         .accountsStrict({
+          launchpadOwner: LAUNCHPAD_OWNER,
           owner: owner.publicKey,
           ownerTokenAccount: ownerAta,
           idoCampaign: idoCampaignPda,
@@ -144,6 +151,7 @@ describe("withdraw_funds tests", () => {
       await program.methods
         .withdrawFunds()
         .accountsStrict({
+          launchpadOwner: LAUNCHPAD_OWNER,
           owner: owner.publicKey,
           ownerTokenAccount: ownerAta,
           idoCampaign: idoCampaignPda,
@@ -217,6 +225,7 @@ describe("withdraw_funds tests", () => {
       await program.methods
         .withdrawFunds()
         .accountsStrict({
+          launchpadOwner: LAUNCHPAD_OWNER,
           owner: owner.publicKey,
           ownerTokenAccount: ownerAta,
           idoCampaign: idoCampaignPda,
@@ -287,6 +296,7 @@ describe("withdraw_funds tests", () => {
       await program.methods
         .withdrawFunds()
         .accountsStrict({
+          launchpadOwner: LAUNCHPAD_OWNER,
           owner: owner.publicKey,
           ownerTokenAccount: wrongOwnerAta,
           idoCampaign: idoCampaignPda,
@@ -354,12 +364,14 @@ describe("withdraw_funds tests", () => {
     expect(solBefore).to.be.greaterThan(0);
 
     const ownerSolBefore = await provider.connection.getBalance(owner.publicKey);
+    const launchpadSolBefore = await provider.connection.getBalance(LAUNCHPAD_OWNER);
     const ownerAtaBefore = await getAccount(provider.connection, ownerAta);
     const treasuryBefore = await getAccount(provider.connection, tokensTreasuryPda);
 
     const sig = await program.methods
       .withdrawFunds()
       .accountsStrict({
+        launchpadOwner: LAUNCHPAD_OWNER,
         owner: owner.publicKey,
         ownerTokenAccount: ownerAta,
         idoCampaign: idoCampaignPda,
@@ -381,11 +393,16 @@ describe("withdraw_funds tests", () => {
     expect(solAfter).to.equal(0);
 
     const ownerSolAfter = await provider.connection.getBalance(owner.publicKey);
+    const launchpadSolAfter = await provider.connection.getBalance(LAUNCHPAD_OWNER);
+
+    const launchpadCut = Math.floor(solBefore / 100) * 5; // matches program: amount / 100 * 5
+    const ownerCut = solBefore - launchpadCut;
     if (tx?.meta?.fee != null) {
-      expect(ownerSolAfter).to.equal(ownerSolBefore + solBefore - tx.meta.fee);
+      expect(ownerSolAfter).to.equal(ownerSolBefore + ownerCut - tx.meta.fee);
+      expect(launchpadSolAfter).to.equal(launchpadSolBefore + launchpadCut);
     } else {
-      // Fee is tiny on localnet; allow a generous slack.
-      expect(ownerSolAfter).to.be.at.least(ownerSolBefore + solBefore - 100_000);
+      expect(ownerSolAfter).to.be.at.least(ownerSolBefore + ownerCut - 100_000);
+      expect(launchpadSolAfter).to.be.at.least(launchpadSolBefore + launchpadCut);
     }
 
     const ownerAtaAfter = await getAccount(provider.connection, ownerAta);
@@ -404,6 +421,7 @@ describe("withdraw_funds tests", () => {
       await program.methods
         .withdrawFunds()
         .accountsStrict({
+          launchpadOwner: LAUNCHPAD_OWNER,
           owner: owner.publicKey,
           ownerTokenAccount: ownerAta,
           idoCampaign: idoCampaignPda,
