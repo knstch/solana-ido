@@ -60,4 +60,20 @@ pub mod solana_ido {
     pub fn close_campaign(ctx: Context<CloseCampaign>) -> Result<()> {
         crate::instructions::close_campaign::close_campaign(ctx)
     }
+
+    pub fn refund(ctx: Context<Refund>) -> Result<()> {
+        crate::instructions::refund::refund(ctx)
+    }
+
+    pub fn close_campaign_if_soft_cap_not_reached(
+        ctx: Context<CloseCampaignIfSoftCapNotReached>,
+    ) -> Result<()> {
+        crate::instructions::close_campaign_if_soft_cap_not_reached::close_campaign_if_soft_cap_not_reached(ctx)
+    }
+
+    pub fn withdraw_tokens_to_owner_if_soft_cap_not_reached(
+        ctx: Context<WithdrawTokensToOwnerIfSoftCapNotReached>,
+    ) -> Result<()> {
+        crate::instructions::withdraw_tokens_to_owner_if_soft_cap_not_reached::withdraw_tokens_to_owner_if_soft_cap_not_reached(ctx)
+    }
 }

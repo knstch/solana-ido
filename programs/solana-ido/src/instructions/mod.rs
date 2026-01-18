@@ -6,6 +6,8 @@ pub mod claim;
 pub mod withdraw_funds;
 pub mod close_campaign;
 pub mod refund;
+pub mod close_campaign_if_soft_cap_not_reached;
+pub mod withdraw_tokens_to_owner_if_soft_cap_not_reached;
 
 pub use create_ido_campaign::*;
 pub use errors::*;
@@ -15,3 +17,5 @@ pub use claim::*;
 pub use withdraw_funds::*;
 pub use close_campaign::*;
 pub use refund::*;
+pub use close_campaign_if_soft_cap_not_reached::*;
+pub use withdraw_tokens_to_owner_if_soft_cap_not_reached::*;

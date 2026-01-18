@@ -84,4 +84,8 @@ pub enum IdoError {
     ErrTokenSupplyAlreadyDeposited,
     #[msg("Invalid token decimals")]
     ErrInvalidTokenDecimals,
+    #[msg("Soft cap reached")]
+    ErrSoftCapReached,
+    #[msg("Nothing to withdraw")]
+    ErrNothingToWithdraw,
 }
